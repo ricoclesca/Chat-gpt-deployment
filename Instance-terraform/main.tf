@@ -4,7 +4,7 @@ resource "aws_security_group" "Jenkins-sg" {
 
   # Define a single ingress rule to allow traffic on all specified ports
   ingress = [
-    for port in [22, 80, 443, 8080, 9000,9100,9090,3000] : {
+    for port in [22, 80, 443, 8080, 9000, 9100, 9090, 3000] : {
       description      = "TLS from VPC"
       from_port        = port
       to_port          = port
@@ -31,9 +31,9 @@ resource "aws_security_group" "Jenkins-sg" {
 
 
 resource "aws_instance" "web" {
-  ami                    = "ami-0c7217cdde317cfec"  #change your ami value according to your aws instance
+  ami                    = "ami-0c7217cdde317cfec" #change your ami value according to your aws instance
   instance_type          = "t2.large"
-  key_name               = "my key"
+  key_name               = "linux_instance"
   vpc_security_group_ids = [aws_security_group.Jenkins-sg.id]
   user_data              = templatefile("./script.sh", {})
 
@@ -47,7 +47,7 @@ resource "aws_instance" "web" {
 resource "aws_instance" "web2" {
   ami                    = "ami-0c7217cdde317cfec" #change your ami value according to your aws instance 
   instance_type          = "t2.medium"
-  key_name               = "my key"
+  key_name               = "linux_instance"
   vpc_security_group_ids = [aws_security_group.Jenkins-sg.id]
   tags = {
     Name = "Monitering via grafana"
