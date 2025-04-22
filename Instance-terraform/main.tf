@@ -56,3 +56,22 @@ resource "aws_instance" "web2" {
     volume_size = 30
   }
 }
+
+
+# S3 bucket for Terraform backend
+resource "aws_s3_bucket" "terraform_backend" {
+  bucket = "gpt-deployment-rico"
+
+  tags = {
+    Name        = "Terraform Backend Bucket"
+    Environment = "dev"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "versioning" {
+  bucket = aws_s3_bucket.terraform_backend.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
