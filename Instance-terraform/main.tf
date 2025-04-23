@@ -26,6 +26,7 @@ resource "aws_security_group" "Jenkins-sg" {
 
   tags = {
     Name = "Jenkins-sg"
+    Project = "gpt"
   }
 }
 
@@ -39,6 +40,7 @@ resource "aws_instance" "web" {
 
   tags = {
     Name = "gpt clone"
+    Project = "gpt"
   }
   root_block_device {
     volume_size = 30
@@ -51,6 +53,7 @@ resource "aws_instance" "web2" {
   vpc_security_group_ids = [aws_security_group.Jenkins-sg.id]
   tags = {
     Name = "Monitering via grafana"
+    Project = "gpt"
   }
   root_block_device {
     volume_size = 30
@@ -74,4 +77,60 @@ resource "aws_s3_bucket_versioning" "versioning" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+resource "aws_iam_role_policy_attachment" "jenkins_readonly_ec2" {
+  role       = "AmazonSSMRoleForInstancesQuickSetup" # double-check the exact name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+}
+
+resource "aws_iam_role" "jenkins_execution" {
+  name = "jenkins-terraform-execution-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    Name = "JenkinsTerraformExecutionRole"
+  }
+}
+
+resource "aws_iam_role_policy" "jenkins_permissions" {
+  name = "jenkins-permissions-policy"
+  role = aws_iam_role.jenkins_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          # EKS
+          "eks:*",
+          # IAM
+          "iam:CreateRole",
+          "iam:PutRolePolicy",
+          "iam:AttachRolePolicy",
+          "iam:PassRole",
+          # EC2 (data source lookups)
+          "ec2:Describe*",
+          # S3 (state backend)
+          "s3:*",
+          # Logs (CloudWatch logging)
+          "logs:*"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
 }
