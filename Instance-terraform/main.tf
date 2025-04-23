@@ -79,11 +79,6 @@ resource "aws_s3_bucket_versioning" "versioning" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "jenkins_readonly_ec2" {
-  role       = "AmazonSSMRoleForInstancesQuickSetup" # double-check the exact name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
-}
-
 resource "aws_iam_role" "jenkins_execution" {
   name = "jenkins-terraform-execution-role"
 
@@ -120,7 +115,7 @@ resource "aws_iam_policy" "jenkins_execution_policy" {
           "iam:PutRolePolicy",
           "iam:AttachRolePolicy",
           "iam:PassRole",
-          "ec2:Describe*",
+          "ec2:*",
           "s3:*",
           "logs:*"
         ],
