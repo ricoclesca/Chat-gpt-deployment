@@ -25,7 +25,7 @@ resource "aws_security_group" "Jenkins-sg" {
   }
 
   tags = {
-    Name = "Jenkins-sg"
+    Name    = "Jenkins-sg"
     Project = "gpt"
   }
 }
@@ -39,7 +39,7 @@ resource "aws_instance" "web" {
   user_data              = templatefile("./script.sh", {})
 
   tags = {
-    Name = "gpt clone"
+    Name    = "gpt clone"
     Project = "gpt"
   }
   root_block_device {
@@ -52,7 +52,7 @@ resource "aws_instance" "web2" {
   key_name               = "linux_instance"
   vpc_security_group_ids = [aws_security_group.Jenkins-sg.id]
   tags = {
-    Name = "Monitering via grafana"
+    Name    = "Monitering via grafana"
     Project = "gpt"
   }
   root_block_device {
@@ -83,7 +83,7 @@ resource "aws_iam_role_policy_attachment" "jenkins_readonly_ec2" {
   role       = "AmazonSSMRoleForInstancesQuickSetup" # double-check the exact name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
-_______________________________________-
+
 resource "aws_iam_role" "jenkins_execution" {
   name = "jenkins-terraform-execution-role"
 
