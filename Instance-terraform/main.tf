@@ -124,6 +124,7 @@ resource "aws_iam_policy" "jenkins_execution_policy" {
           "iam:ListRoleTags",
           "iam:ListPolicies",
           "iam:ListInstanceProfilesRoles",
+          "iam:ListInstanceProfilesforRole",
           "iam:ListInstanceProfiles",
           "iam:ListAttachedGroupPolicies",
           "iam:ListGroupPolicies",
