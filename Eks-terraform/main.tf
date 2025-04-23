@@ -25,11 +25,20 @@ resource "aws_iam_role_policy_attachment" "example-AmazonEKSClusterPolicy" {
 data "aws_vpc" "default" {
   default = true
 }
-#get public subnets for cluster
+
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 data "aws_subnets" "public" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
+  }
+
+  filter {
+    name   = "availability-zone"
+    values = [for az in data.aws_availability_zones.available.names : az if az != "us-east-1e"]
   }
 }
 #cluster provision
