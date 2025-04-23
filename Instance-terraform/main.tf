@@ -105,9 +105,30 @@ resource "aws_iam_role" "jenkins_execution" {
   }
 }
 
-resource "aws_iam_role_policy" "jenkins_permissions" {
-  name = "jenkins-permissions-policy"
-  role = aws_iam_role.jenkins_execution.id
+resource "aws_iam_role" "jenkins_execution" {
+  name = "jenkins-terraform-execution-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = {
+    Name = "JenkinsTerraformExecutionRole"
+  }
+}
+
+resource "aws_iam_policy" "jenkins_execution_policy" {
+  name        = "jenkins-permissions-policy"
+  description = "Permissions for Jenkins to deploy EKS and manage related AWS resources"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -115,22 +136,22 @@ resource "aws_iam_role_policy" "jenkins_permissions" {
       {
         Effect = "Allow",
         Action = [
-          # EKS
           "eks:*",
-          # IAM
           "iam:CreateRole",
           "iam:PutRolePolicy",
           "iam:AttachRolePolicy",
           "iam:PassRole",
-          # EC2 (data source lookups)
           "ec2:Describe*",
-          # S3 (state backend)
           "s3:*",
-          # Logs (CloudWatch logging)
           "logs:*"
         ],
         Resource = "*"
       }
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "jenkins_attach_policy" {
+  role       = aws_iam_role.jenkins_execution.name
+  policy_arn = aws_iam_policy.jenkins_execution_policy.arn
 }
