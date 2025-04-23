@@ -83,28 +83,7 @@ resource "aws_iam_role_policy_attachment" "jenkins_readonly_ec2" {
   role       = "AmazonSSMRoleForInstancesQuickSetup" # double-check the exact name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
-
-resource "aws_iam_role" "jenkins_execution" {
-  name = "jenkins-terraform-execution-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        },
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
-
-  tags = {
-    Name = "JenkinsTerraformExecutionRole"
-  }
-}
-
+_______________________________________-
 resource "aws_iam_role" "jenkins_execution" {
   name = "jenkins-terraform-execution-role"
 
