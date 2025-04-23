@@ -35,6 +35,7 @@ resource "aws_instance" "web" {
   ami                    = "ami-0c7217cdde317cfec" #change your ami value according to your aws instance
   instance_type          = "t2.large"
   key_name               = "linux_instance"
+  iam_instance_profile   = aws_iam_instance_profile.jenkins_profile.name
   vpc_security_group_ids = [aws_security_group.Jenkins-sg.id]
   user_data              = templatefile("./script.sh", {})
 
@@ -139,4 +140,9 @@ resource "aws_iam_policy" "jenkins_execution_policy" {
 resource "aws_iam_role_policy_attachment" "jenkins_attach_policy" {
   role       = aws_iam_role.jenkins_execution.name
   policy_arn = aws_iam_policy.jenkins_execution_policy.arn
+}
+
+resource "aws_iam_instance_profile" "jenkins_profile" {
+  name = "jenkins-instance-profile"
+  role = aws_iam_role.jenkins_execution.name
 }
