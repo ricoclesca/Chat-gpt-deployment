@@ -128,7 +128,7 @@ resource "aws_iam_policy" "jenkins_execution_policy" {
           "iam:ListInstanceProfiles",
           "iam:ListAttachedGroupPolicies",
           "iam:ListGroupPolicies",
-          "iam:DeleteRole"
+          "iam:DeleteRole",
           "ec2:*",
           "s3:*",
           "logs:*"
